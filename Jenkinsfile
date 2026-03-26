@@ -9,15 +9,28 @@ pipeline {
         IMG="mon-projet-java-mathieu:${env.BUILD_NUMBER}"
         CT_NAME="mon-projet-java-mathieu-container"
         URL_NOTIFICATIONS="https://ntfy.sh/1x6DHZYwBpRxKUJF"
+        SONAR_PRJ_KEY="projet-mathieu"
     }
-
+    
     stages {
         stage('Compilation du projet') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean verify'
             }
         }
 
+        stage('Analyse sonar') {
+            steps {
+                withSonarQubeEnv('SonarqubeSNCF') {
+                    sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=${SONAR_PRJ_KEY} \
+                    -Dsonar.projectName=${SONAR_PRJ_KEY}
+                    """
+                }
+            }
+        }
+        
         stage('Build docker image') {
             steps {
                 sh "docker build -t ${IMG} ."
