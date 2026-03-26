@@ -36,6 +36,7 @@ pipeline {
         success {
             echo "Ca a fonctionné"
             sh "docker ps | grep ${CT_NAME}"
+            sh "docker logs ${CT_NAME}"
         }
     }
 }
